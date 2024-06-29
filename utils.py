@@ -1,9 +1,8 @@
-# Вспомогательные функции, например, для работы с памятью
-
-def read_memory(address):
-    # Чтение значения по адресу
-    pass
-
-def write_memory(address, value):
-    # Запись значения по адресу
-    pass
+def load_coordinates(file_path='coordinates.txt'):
+    coordinates = {}
+    with open(file_path, 'r') as f:
+        for line in f:
+            key, value = line.strip().split(': ')
+            x, y = map(int, value.split(', '))
+            coordinates[key] = (x, y)
+    return coordinates
