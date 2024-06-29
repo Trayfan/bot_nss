@@ -6,13 +6,34 @@ from utils import load_coordinates
 class InventoryManager:
     def __init__(self, memory_manager):
         self.memory_manager = memory_manager
-        self.coordinates = load_coordinates()
+        self.coordinates, self.colors = load_coordinates()
 
     def open_inventory(self):
-        # Нажатие на координаты кнопки открытия инвентаря
         inventory_button_coordinates = self.coordinates['inventory_button']
-        pyautogui.click(inventory_button_coordinates)
-        time.sleep(1)  # Ожидание открытия инвентаря
+        max_attempts = 5
+        attempt = 0
+        inventory_opened = False
+
+        while attempt < max_attempts and not inventory_opened:
+            pyautogui.click(inventory_button_coordinates)
+            time.sleep(1)  # Ожидание открытия инвентаря
+
+            # Проверка открытия инвентаря
+            inventory_opened = self.is_inventory_open()
+
+            attempt += 1
+
+        if not inventory_opened:
+            print("Ошибка: не удалось открыть инвентарь после нескольких попыток")
+        else:
+            print("Инвентарь успешно открыт")
+
+    def is_inventory_open(self):
+        icon_coordinates = self.coordinates['white_icon']
+        expected_color = self.colors['white_icon']
+        screenshot = pyautogui.screenshot(region=(icon_coordinates[0], icon_coordinates[1], 1, 1))
+        actual_color = screenshot.getpixel((0, 0))
+        return actual_color == expected_color
 
     def check_item(self, slot):
         slot_coordinates = self.coordinates[slot]
@@ -27,10 +48,9 @@ class InventoryManager:
         time.sleep(0.5)  # Ожидание использования предмета
 
 if __name__ == "__main__":
-    process_name = "PiratesOnline.exe"
+    process_name = "Game.exe"  # Изменено на правильное имя процесса
     memory_manager = MemoryManager(process_name)
     inventory_manager = InventoryManager(memory_manager)
     
+    # Тестирование открытия инвентаря
     inventory_manager.open_inventory()
-    inventory_manager.check_item('slot_1')
-    inventory_manager.use_item('slot_1')

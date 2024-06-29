@@ -1,0 +1,5 @@
+inventory_button: 2355, 1420
+slot_1: 140, 249
+slot_2: 177, 248
+white_icon: 294, 476
+white_icon_color: 235, 235, 235
