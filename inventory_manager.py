@@ -1,7 +1,7 @@
 import pyautogui
 import time
 from memory_manager import MemoryManager
-from utils import load_coordinates
+from utils import load_coordinates, wait_for_game_window, click_with_delay
 
 class InventoryManager:
     def __init__(self, memory_manager):
@@ -9,13 +9,16 @@ class InventoryManager:
         self.coordinates, self.colors = load_coordinates()
 
     def open_inventory(self):
+        wait_for_game_window("Pirates Online")  # Ожидание активного окна игры
+
         inventory_button_coordinates = self.coordinates['inventory_button']
         max_attempts = 5
         attempt = 0
         inventory_opened = False
 
         while attempt < max_attempts and not inventory_opened:
-            pyautogui.click(inventory_button_coordinates)
+            x, y = inventory_button_coordinates
+            click_with_delay(x, y, button='right')
             time.sleep(1)  # Ожидание открытия инвентаря
 
             # Проверка открытия инвентаря
@@ -44,7 +47,7 @@ class InventoryManager:
     def use_item(self, slot):
         slot_coordinates = self.coordinates[slot]
         x, y = slot_coordinates
-        pyautogui.click(x, y)
+        click_with_delay(x, y, button='left')
         time.sleep(0.5)  # Ожидание использования предмета
 
 if __name__ == "__main__":

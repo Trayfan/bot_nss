@@ -1,5 +1,11 @@
-inventory_button: 2355, 1420
-slot_1: 140, 249
-slot_2: 177, 248
-white_icon: 294, 476
+inventory_button: 2357, 1419
+slot_1: 138, 249
+slot_2: 172, 249
+white_icon: 295, 477
+radar_button: 1182, 1335
+radar_open: 542, 266
+x_input: 424, 277
+y_input: 495, 273
+confirm_button: 471, 308
 white_icon_color: 235, 235, 235
+radar_open_color: 255, 255, 255

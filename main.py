@@ -1,22 +1,16 @@
-from inventory_manager import InventoryManager
-from memory_manager import MemoryManager
 from movement_manager import MovementManager
-from npc_interaction import NPCInteraction
-from treasure_hunt import TreasureHunt
-from teleport_manager import TeleportManager
-from event_handler import EventHandler
+from memory_manager import MemoryManager
+from utils import wait_for_game_window
 
 def main():
-    process_name = "PiratesOnline.exe"
+    wait_for_game_window("Pirates Online")  # Ожидание активного окна игры
+    process_name = "Game.exe"
     memory_manager = MemoryManager(process_name)
-    inventory_manager = InventoryManager(memory_manager)
     movement_manager = MovementManager(memory_manager)
-    npc_interaction = NPCInteraction(memory_manager)
-    treasure_hunt = TreasureHunt(memory_manager)
-    teleport_manager = TeleportManager(memory_manager)
-    event_handler = EventHandler(memory_manager)
-
-    # Основной алгоритм выполнения бота будет здесь
-
+    
+    # Тестирование перемещения к координатам (пример координат 1234, 5678)
+    movement_manager.move_to_coordinates_water(843,3702)
+    movement_manager.move_to_coordinates_water(846,3740)
+    movement_manager.move_to_coordinates_water(877,3758)
 if __name__ == "__main__":
     main()
