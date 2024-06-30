@@ -27,15 +27,21 @@ class MemoryManager:
     def read_memory(self, address, value_type=ctypes.c_float):
         value = value_type()
         bytesRead = ctypes.c_ulonglong()
-        ctypes.windll.kernel32.ReadProcessMemory(self.process_handle, ctypes.c_void_p(address), ctypes.byref(value), ctypes.sizeof(value), ctypes.byref(bytesRead))
+        result = ctypes.windll.kernel32.ReadProcessMemory(self.process_handle, ctypes.c_void_p(address), ctypes.byref(value), ctypes.sizeof(value), ctypes.byref(bytesRead))
+        if not result:
+            print(f"Failed to read memory at address {hex(address)}")
+            return None
         return value.value
 
     def read_coordinates(self, base_address, offsets):
         address = base_address
         for offset in offsets[:-1]:
-            address = int(self.read_memory(address + offset, ctypes.c_ulonglong))
-        address += offsets[-1]
-        return self.read_memory(address, ctypes.c_float)
+            address = self.read_memory(address + offset, ctypes.c_ulonglong)
+            if address is None:
+                return None
+            address = int(address)
+        final_address = address + offsets[-1]
+        return self.read_memory(final_address, ctypes.c_float)
 
 # Пример использования
 if __name__ == "__main__":
