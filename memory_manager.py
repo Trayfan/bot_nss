@@ -1,33 +1,45 @@
-import pymem
+import psutil
 import ctypes
 
 class MemoryManager:
     def __init__(self, process_name):
         self.process_name = process_name
-        self.process = pymem.Pymem(process_name)
+        self.process = self.get_process_by_name(process_name)
+        self.process_handle = self.open_process(self.process.pid)
         self.base_address = self.get_base_address()
 
-    def get_base_address(self):
-        module = pymem.process.module_from_name(self.process.process_handle, self.process_name)
-        print(f"Base address of {self.process_name}: {hex(module.lpBaseOfDll)}")
-        return module.lpBaseOfDll
+    def get_process_by_name(self, process_name):
+        for proc in psutil.process_iter(['pid', 'name']):
+            if proc.info['name'] == process_name:
+                return proc
+        raise Exception(f"Process '{process_name}' not found")
 
-    def read_memory(self, base_address, offsets):
+    def open_process(self, pid):
+        PROCESS_ALL_ACCESS = 0x1F0FFF
+        return ctypes.windll.kernel32.OpenProcess(PROCESS_ALL_ACCESS, False, pid)
+
+    def get_base_address(self):
+        for module in self.process.memory_maps(grouped=False):
+            if self.process_name in module.path:
+                return int(module.addr.split('-')[0], 16)
+        raise Exception(f"Base address for '{self.process_name}' not found")
+
+    def read_memory(self, address, value_type=ctypes.c_float):
+        value = value_type()
+        bytesRead = ctypes.c_ulonglong()
+        ctypes.windll.kernel32.ReadProcessMemory(self.process_handle, ctypes.c_void_p(address), ctypes.byref(value), ctypes.sizeof(value), ctypes.byref(bytesRead))
+        return value.value
+
+    def read_coordinates(self, base_address, offsets):
         address = base_address
         for offset in offsets[:-1]:
-            address = self.read_int(address + offset)
-        return self.read_float(address + offsets[-1])
+            address = int(self.read_memory(address + offset, ctypes.c_ulonglong))
+        address += offsets[-1]
+        return self.read_memory(address, ctypes.c_float)
 
-    def read_int(self, address):
-        value = ctypes.c_int()
-        bytesRead = ctypes.c_size_t()
-        if not ctypes.windll.kernel32.ReadProcessMemory(self.process.process_handle, ctypes.c_void_p(address), ctypes.byref(value), ctypes.sizeof(value), ctypes.byref(bytesRead)):
-            print(f"Failed to read int memory at address {address}")
-        return value.value
-
-    def read_float(self, address):
-        value = ctypes.c_float()
-        bytesRead = ctypes.c_size_t()
-        if not ctypes.windll.kernel32.ReadProcessMemory(self.process.process_handle, ctypes.c_void_p(address), ctypes.byref(value), ctypes.sizeof(value), ctypes.byref(bytesRead)):
-            print(f"Failed to read float memory at address {address}")
-        return value.value
+# Пример использования
+if __name__ == "__main__":
+    process_name = "Game.exe"
+    memory_manager = MemoryManager(process_name)
+    base_address = memory_manager.get_base_address()
+    print(f"Base address: {hex(base_address)}")
