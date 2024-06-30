@@ -8,9 +8,9 @@ def main():
     memory_manager = MemoryManager(process_name)
     movement_manager = MovementManager(memory_manager)
     
-    # Тестирование перемещения к координатам (пример координат 1234, 5678)
-    movement_manager.move_to_coordinates_water(843,3702)
-    movement_manager.move_to_coordinates_water(846,3740)
-    movement_manager.move_to_coordinates_water(877,3758)
+    # Тестирование перемещения по воде к координатам (пример координат 1234, 5678) с радиусом 5
+    route = [(842,3699), (846,3731), (877,3751)]  # Пример маршрута из нескольких точек
+    movement_manager.follow_route(route, tolerance=2)
+    
 if __name__ == "__main__":
     main()
