@@ -1,7 +1,7 @@
 import pyautogui
 import time
-from memory_manager import MemoryManager
-from utils import load_coordinates, wait_for_game_window, click_with_delay
+from core.memory_manager import MemoryManager
+from core.utils import load_coordinates, wait_for_game_window, click_with_delay
 
 class InventoryManager:
     def __init__(self, memory_manager):
